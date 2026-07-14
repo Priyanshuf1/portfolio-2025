@@ -658,28 +658,28 @@ function CyberCore() {
       {/* Central Brain/Core */}
       <mesh>
         <icosahedronGeometry args={[2.5, 2]} />
-        <meshBasicMaterial color="#a78bfa" wireframe transparent opacity={0.3} />
+        <meshPhysicalMaterial color="#5a2bb3" wireframe transparent opacity={0.5} roughness={0.1} metalness={0.9} />
       </mesh>
       
       <mesh>
         <icosahedronGeometry args={[2.3, 1]} />
-        <meshBasicMaterial color="#30b8ff" wireframe transparent opacity={0.15} />
+        <meshPhysicalMaterial color="#005b9f" wireframe transparent opacity={0.3} roughness={0.1} metalness={0.9} />
       </mesh>
 
       {/* Orbiting Rings */}
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[3.2, 0.02, 16, 100]} />
-        <meshBasicMaterial color="#ff0044" transparent opacity={0.5} />
+        <meshPhysicalMaterial color="#b30030" transparent opacity={0.6} roughness={0.2} metalness={0.8} />
       </mesh>
       
       <mesh rotation={[Math.PI / 4, Math.PI / 4, 0]}>
         <torusGeometry args={[3.8, 0.01, 16, 100]} />
-        <meshBasicMaterial color="#30b8ff" transparent opacity={0.3} />
+        <meshPhysicalMaterial color="#005b9f" transparent opacity={0.4} roughness={0.2} metalness={0.8} />
       </mesh>
       
       <mesh rotation={[-Math.PI / 4, Math.PI / 6, 0]}>
         <torusGeometry args={[4.5, 0.03, 16, 100]} />
-        <meshBasicMaterial color="#a78bfa" transparent opacity={0.2} />
+        <meshPhysicalMaterial color="#5a2bb3" transparent opacity={0.3} roughness={0.2} metalness={0.8} />
       </mesh>
     </group>
   )

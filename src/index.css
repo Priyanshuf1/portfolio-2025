@@ -561,12 +561,13 @@ a, button {
   font-family: var(--syne);
   font-size: clamp(2.5rem, 6vw, 4.5rem);
   font-weight: 800;
-  color: var(--white);
+  color: #000000;
   margin-bottom: 2rem;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
 }
 
 .page5-title span {
-  color: #30b8ff;
+  color: #0a4b85;
 }
 
 .about-grid {
@@ -577,9 +578,12 @@ a, button {
 
 .about-text {
   font-family: var(--mono);
-  font-size: 0.85rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #000000;
   line-height: 1.9;
-  opacity: 0.75;
+  opacity: 1;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 }
 
 .about-stats {
@@ -589,22 +593,23 @@ a, button {
 }
 
 .stat-item {
-  border-left: 2px solid #30b8ff;
+  border-left: 3px solid #0a4b85;
   padding-left: 1rem;
 }
 
 .stat-num {
   font-family: var(--syne);
   font-size: 2rem;
-  font-weight: 700;
-  color: var(--white);
+  font-weight: 800;
+  color: #000000;
 }
 
 .stat-label {
   font-family: var(--mono);
-  font-size: 0.7rem;
-  color: #30b8ff;
-  letter-spacing: 0.1em;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: #111111;
 }
 
 /* Mobile adjustments */
