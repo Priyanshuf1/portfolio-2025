@@ -689,9 +689,8 @@ function Page4Scene() {
   return (
     <>
       <SetRenderer exposure={1.2} toneMapping={THREE.ACESFilmicToneMapping} />
-      <color attach="background" args={['#020005']} />
-      <fog attach="fog" args={['#020005', 5, 20]} />
-
+      {/* Removed 3D background color so the CSS background image shows through */}
+      
       <Stars radius={100} depth={50} count={4000} factor={4} saturation={1} fade speed={1.5} />
 
       <ambientLight intensity={0.5} color="#30b8ff" />
@@ -1032,7 +1031,13 @@ export default function App() {
       </section>
 
       {/* ═══ PAGE 4 — ABOUT ME ═══ */}
-      <section id="page4" className="section" style={{ background: '#050008' }}>
+      <section id="page4" className="section" style={{ 
+        background: '#050008',
+        backgroundImage: "url('/bg4.jpg')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}>
         <Canvas className="scene-canvas" camera={{ position: [0, 0, 8], fov: 55 }}>
           <Page4Scene />
         </Canvas>
