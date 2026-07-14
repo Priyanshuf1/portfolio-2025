@@ -71,7 +71,8 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 2rem 2.5rem;
+  flex-direction: row-reverse;
+  padding: 3.5rem 2.5rem 0;
 }
 
 .header-logo {
