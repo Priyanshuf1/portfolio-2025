@@ -685,8 +685,9 @@ a, button {
   font-weight: 800;
   line-height: 0.95;
   letter-spacing: -0.02em;
-  color: var(--white);
+  color: #ffffff;
   margin-bottom: 1.2rem;
+  text-shadow: 2px 2px 5px rgba(0,0,0,0.9), 0 0 25px rgba(167, 139, 250, 0.4);
 }
 
 .page3-title span {
@@ -696,9 +697,12 @@ a, button {
 
 .page3-desc {
   font-family: var(--mono);
-  font-size: 0.82rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #e2d9fb; /* light glowing purple */
   line-height: 1.8;
-  opacity: 0.55;
+  opacity: 1;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.9), 0 0 10px rgba(167, 139, 250, 0.5);
   max-width: 560px;
   margin: 0 auto 2.5rem;
 }
