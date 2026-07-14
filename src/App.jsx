@@ -1,6 +1,6 @@
 import { Suspense, useRef, useEffect, useState, useCallback, useMemo } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { useGLTF, useAnimations, Html, Float, Sparkles, ContactShadows, Environment, useProgress } from '@react-three/drei'
+import { useGLTF, useAnimations, Html, Float, Sparkles, ContactShadows, Environment, useProgress, Stars } from '@react-three/drei'
 import * as THREE from 'three'
 import './index.css'
 
@@ -58,7 +58,7 @@ function GlobalLoader() {
 
   return (
     <div className={`global-loader ${hidden ? 'hidden' : ''}`}>
-      <div className="loader-logo">PA.</div>
+      <div className="loader-logo">PRIYANSHU AWASTHI</div>
       <div className="loader-bar-container">
         <div className="loader-bar" style={{ width: `${progress}%` }} />
       </div>
@@ -590,8 +590,10 @@ function Page3Scene() {
   return (
     <>
       <SetRenderer exposure={1.4} toneMapping={THREE.ACESFilmicToneMapping} />
-      <color attach="background" args={['#050008']} />
-      <fog attach="fog" args={['#050008', 20, 80]} />
+      <color attach="background" args={['#030005']} />
+      <fog attach="fog" args={['#030005', 20, 80]} />
+      
+      <Stars radius={100} depth={50} count={3000} factor={4} saturation={0.5} fade speed={1} />
 
       {/* Bright neutral lighting so original model colors show accurately */}
       <ambientLight intensity={2.5} color="#ffffff" />
@@ -687,8 +689,10 @@ function Page4Scene() {
   return (
     <>
       <SetRenderer exposure={1.2} toneMapping={THREE.ACESFilmicToneMapping} />
-      <color attach="background" args={['#050008']} />
-      <fog attach="fog" args={['#050008', 5, 20]} />
+      <color attach="background" args={['#020005']} />
+      <fog attach="fog" args={['#020005', 5, 20]} />
+
+      <Stars radius={100} depth={50} count={4000} factor={4} saturation={1} fade speed={1.5} />
 
       <ambientLight intensity={0.5} color="#30b8ff" />
       <pointLight position={[2, 0, 0]} intensity={10} color="#a78bfa" distance={15} />
@@ -773,6 +777,8 @@ function Page5Scene() {
       <SetRenderer exposure={1.1} toneMapping={THREE.ACESFilmicToneMapping} />
       <color attach="background" args={['#080400']} />
       <fog attach="fog" args={['#080400', 8, 40]} />
+      
+      <Stars radius={100} depth={50} count={2000} factor={3} saturation={0.8} fade speed={0.5} />
 
       <ambientLight intensity={0.4} color="#ff6b35" />
       <directionalLight position={[0, 8, 5]} intensity={2} color="#ffffff" />
@@ -867,7 +873,7 @@ export default function App() {
 
         <div className="hud">
           <div className="header">
-            <div className="header-logo">PA.</div>
+            <div className="header-logo">PRIYANSHU AWASTHI</div>
             <nav className="header-nav">
               <a href="#page2">PROJECTS</a>
               <a href="#">ABOUT</a>
@@ -925,7 +931,7 @@ export default function App() {
 
         <div className="hud">
           <div className="header">
-            <div className="header-logo">PA.</div>
+            <div className="header-logo">PRIYANSHU AWASTHI</div>
             <nav className="header-nav">
               <a href="#">HOME</a>
               <a href="#">ABOUT</a>
@@ -966,7 +972,7 @@ export default function App() {
 
         <div className="hud">
           <div className="header">
-            <div className="header-logo">PA.</div>
+            <div className="header-logo">PRIYANSHU AWASTHI</div>
             <nav className="header-nav">
               <a href="#page2">← PREV</a>
               <a href="#page4">NEXT →</a>
@@ -1033,7 +1039,7 @@ export default function App() {
 
         <div className="hud">
           <div className="header">
-            <div className="header-logo">PA.</div>
+            <div className="header-logo">PRIYANSHU AWASTHI</div>
             <nav className="header-nav">
               <a href="#page3">← PROJECTS</a>
               <a href="#page5">CONTACT →</a>
@@ -1100,7 +1106,7 @@ export default function App() {
 
         <div className="hud">
           <div className="header">
-            <div className="header-logo">PA.</div>
+            <div className="header-logo">PRIYANSHU AWASTHI</div>
             <nav className="header-nav">
               <a href="#page4">← ABOUT</a>
               <a href="#">TOP ↑</a>
