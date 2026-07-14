@@ -149,6 +149,12 @@ function SetRenderer({ exposure, toneMapping }) {
 // ─── AUTO-NORMALIZE MODEL ─────────────────────────────────────────────────────
 // Fits any model into a target world-space size so it always fills the screen
 function normalizeModel(scene, targetSize = 4, groundIt = true) {
+  // Reset scale and position to default before calculating bounding box
+  // This prevents the model from growing on re-renders (a common React Three Fiber cache bug)
+  scene.scale.setScalar(1)
+  scene.position.set(0, 0, 0)
+  scene.updateMatrixWorld(true)
+
   const box = new THREE.Box3().setFromObject(scene)
   const size = new THREE.Vector3()
   box.getSize(size)
