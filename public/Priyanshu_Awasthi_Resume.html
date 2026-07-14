@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Priyanshu Awasthi - Resume</title>
+    <style>
+        :root {
+            --bg: #050008;
+            --text: #e0e0e0;
+            --accent: #a78bfa;
+            --accent-glow: rgba(167, 139, 250, 0.3);
+            --border: #333;
+        }
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+        header {
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.5rem;
+            color: #fff;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .contact-info {
+            font-size: 0.9rem;
+            color: #aaa;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .contact-info a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .contact-info a:hover {
+            color: #fff;
+            text-shadow: 0 0 8px var(--accent-glow);
+        }
+        section {
+            margin-bottom: 30px;
+        }
+        h2 {
+            font-size: 1.4rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+        .job, .project {
+            margin-bottom: 20px;
+        }
+        .job-title, .project-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+        }
+        .date {
+            font-size: 0.85rem;
+            color: #888;
+            font-weight: normal;
+        }
+        .tech-stack {
+            font-size: 0.85rem;
+            color: #aaa;
+            font-style: italic;
+            margin-bottom: 8px;
+        }
+        ul {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 5px;
+            font-size: 0.95rem;
+        }
+        .skills-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .print-btn {
+            display: block;
+            width: 200px;
+            margin: 0 auto 40px auto;
+            text-align: center;
+            background: var(--accent);
+            color: #000;
+            padding: 12px 24px;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 4px;
+            text-transform: uppercase;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: none;
+        }
+        .print-btn:hover {
+            background: #fff;
+            box-shadow: 0 0 15px var(--accent);
+        }
+        @media print {
+            body {
+                background-color: #fff;
+                color: #000;
+            }
+            .container {
+                box-shadow: none;
+                border: none;
+                margin: 0;
+                padding: 0;
+            }
+            h1, .job-title, .project-title { color: #000; }
+            h2, .contact-info a { color: #333; }
+            .print-btn { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <button class="print-btn" onclick="window.print()">Save as PDF</button>
+
+    <div class="container">
+        <header>
+            <h1>Priyanshu Awasthi</h1>
+            <div class="contact-info">
+                <span>apriyanshu540@gmail.com</span> |
+                <a href="https://github.com/Priyanshuf1" target="_blank">GitHub</a> |
+                <a href="https://www.linkedin.com/in/priyanshu-awasthi-6a8945381/" target="_blank">LinkedIn</a> |
+                <span>Instagram: priyanshu._8x_</span>
+            </div>
+        </header>
+
+        <section>
+            <h2>Summary</h2>
+            <p>Cloud Infrastructure and Agentic AI Specialist with a strong focus on building high-performance, intelligent digital ecosystems. Passionate about leveraging cutting-edge web technologies (React, Three.js, WebGL) and robust cloud architectures to create immersive, automated, and scalable solutions.</p>
+        </section>
+
+        <section>
+            <h2>Core Competencies</h2>
+            <div class="skills-grid">
+                <div>
+                    <strong>Agentic AI & Cloud:</strong>
+                    <ul>
+                        <li>Cloud Architecture (AWS, Vercel)</li>
+                        <li>Agentic AI Integration & Prompt Engineering</li>
+                        <li>Automation & Intelligent Ecosystems</li>
+                    </ul>
+                </div>
+                <div>
+                    <strong>Web Technologies:</strong>
+                    <ul>
+                        <li>React, Next.js, Node.js</li>
+                        <li>3D WebGL (Three.js, React Three Fiber)</li>
+                        <li>Advanced CSS & UI/UX Aesthetics</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Featured Projects</h2>
+            
+            <div class="project">
+                <div class="project-title">
+                    Striver Sheet App
+                    <span class="date">2024</span>
+                </div>
+                <div class="tech-stack">React, Node.js, Vercel</div>
+                <ul>
+                    <li>Developed a comprehensive Data Structures and Algorithms (DSA) progress tracker.</li>
+                    <li>Implemented real-time progress syncing, custom dashboards, and performance analytics.</li>
+                    <li>Deployed via Vercel for highly available, low-latency access.</li>
+                </ul>
+            </div>
+
+            <div class="project">
+                <div class="project-title">
+                    Partners in Property
+                    <span class="date">2024</span>
+                </div>
+                <div class="tech-stack">React, Next.js, Cloud Infrastructure</div>
+                <ul>
+                    <li>Built a premium real estate platform tailored for high-end property listings.</li>
+                    <li>Engineered immersive visuals and highly responsive design architectures.</li>
+                    <li>Utilized robust cloud infrastructure to handle dynamic property data efficiently.</li>
+                </ul>
+            </div>
+
+            <div class="project">
+                <div class="project-title">
+                    Premium Agency V2
+                    <span class="date">2024</span>
+                </div>
+                <div class="tech-stack">React, Three.js, WebGL</div>
+                <ul>
+                    <li>Designed and developed the next evolution of a digital agency website with aggressive cyberpunk aesthetics.</li>
+                    <li>Pushed the limits of 3D WebGL integration and hardware acceleration in the browser.</li>
+                    <li>Integrated immersive, interactive 3D elements that respond dynamically to user input.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section>
+            <h2>Philosophy</h2>
+            <p>Every line of code I write is driven by a philosophy of high performance, scalability, and breathtaking visual design. My goal isn't just to build websites—it's to architect intelligent ecosystems that solve complex problems with minimal human intervention. I build for the future.</p>
+        </section>
+    </div>
+</body>
+</html>
