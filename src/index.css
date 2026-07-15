@@ -360,11 +360,10 @@ body {
 /* ===== PREMIUM FEATURES (Loader, Cursor, Modals) ===== */
 
 /* Custom Cursor */
-body {
-  cursor: none;
-}
-a, button {
-  cursor: none !important;
+@media (pointer: fine) {
+  body, a, button {
+    cursor: none !important;
+  }
 }
 
 .custom-cursor-dot {
@@ -377,8 +376,8 @@ a, button {
   border-radius: 50%;
   pointer-events: none;
   z-index: 9999;
-  transform: translate(-50%, -50%);
   transition: width 0.2s, height 0.2s, background-color 0.2s;
+  will-change: transform;
 }
 
 .custom-cursor-ring {
@@ -391,9 +390,9 @@ a, button {
   border-radius: 50%;
   pointer-events: none;
   z-index: 9998;
-  transform: translate(-50%, -50%);
   transition: width 0.3s, height 0.3s, border-color 0.3s, opacity 0.3s;
   transition-timing-function: ease-out;
+  will-change: transform;
 }
 
 /* Hover state for cursor */

@@ -1,8 +1,46 @@
-import { Suspense, useRef, useEffect, useState, useCallback, useMemo } from 'react'
+import { Suspense, useRef, useEffect, useState, useMemo } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { useGLTF, useAnimations, Html, Float, Sparkles, ContactShadows, Environment, useProgress, Stars } from '@react-three/drei'
+import { useGLTF, useAnimations, Html, Sparkles, ContactShadows, Environment, useProgress, Stars } from '@react-three/drei'
 import * as THREE from 'three'
 import './index.css'
+
+// ─── UNIFIED INPUT HOOK (Mouse + Touch + Gyroscope) ──────────────────────────
+function useInteractiveInput(mouseRef) {
+  useEffect(() => {
+    const onMove = (e) => {
+      if (e.touches && e.touches.length > 0) {
+        mouseRef.current.x = (e.touches[0].clientX / window.innerWidth) * 2 - 1
+        mouseRef.current.y = -(e.touches[0].clientY / window.innerHeight) * 2 - 1
+      } else if (e.clientX !== undefined) {
+        mouseRef.current.x = (e.clientX / window.innerWidth) * 2 - 1
+        mouseRef.current.y = -(e.clientY / window.innerHeight) * 2 + 1
+      }
+    }
+
+    const onOrientation = (e) => {
+      if (e.gamma !== null && e.beta !== null) {
+        // Normalize gyroscope data (-1 to 1)
+        const x = THREE.MathUtils.clamp(e.gamma / 45, -1, 1)
+        // Assume resting phone angle is ~45 degrees (beta)
+        const y = THREE.MathUtils.clamp(-(e.beta - 45) / 45, -1, 1)
+        
+        // Smoothly overwrite mouse ref with gyro data if available
+        mouseRef.current.x = x
+        mouseRef.current.y = y
+      }
+    }
+
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('touchmove', onMove, { passive: true })
+    window.addEventListener('deviceorientation', onOrientation, true)
+
+    return () => {
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('touchmove', onMove)
+      window.removeEventListener('deviceorientation', onOrientation, true)
+    }
+  }, [mouseRef])
+}
 
 // ─── PREMIUM UI COMPONENTS (Loader, Cursor, Sounds) ───────────────────────────
 
@@ -68,19 +106,30 @@ function GlobalLoader() {
 }
 
 function CustomCursor() {
-  const [pos, setPos] = useState({ x: 0, y: 0 })
-  const [isHovering, setIsHovering] = useState(false)
+  const dotRef = useRef(null)
+  const ringRef = useRef(null)
 
   useEffect(() => {
+    // Disable custom cursor on touch devices to improve performance
+    if (window.matchMedia("(pointer: coarse)").matches) return
+
     const onMove = (e) => {
-      setPos({ x: e.clientX, y: e.clientY })
+      // Use direct hardware-accelerated DOM mutation instead of React state
+      // Offset by half the width/height (dot=6px, ring=30px) to center it
+      if (dotRef.current) {
+        dotRef.current.style.transform = `translate3d(${e.clientX - 3}px, ${e.clientY - 3}px, 0)`
+      }
+      if (ringRef.current) {
+        ringRef.current.style.transform = `translate3d(${e.clientX - 15}px, ${e.clientY - 15}px, 0)`
+      }
     }
     
     // Add event listeners for hover states and sounds
     const onMouseOver = (e) => {
       const target = e.target.closest('a, button, .project-card, .modal-close')
       if (target) {
-        setIsHovering(true)
+        if (dotRef.current) dotRef.current.classList.add('hovering')
+        if (ringRef.current) ringRef.current.classList.add('hovering')
         SoundManager.init()
         SoundManager.playHover()
       }
@@ -88,7 +137,8 @@ function CustomCursor() {
     
     const onMouseOut = (e) => {
       if (e.target.closest('a, button, .project-card, .modal-close')) {
-        setIsHovering(false)
+        if (dotRef.current) dotRef.current.classList.remove('hovering')
+        if (ringRef.current) ringRef.current.classList.remove('hovering')
       }
     }
 
@@ -121,14 +171,8 @@ function CustomCursor() {
 
   return (
     <>
-      <div 
-        className={`custom-cursor-dot ${isHovering ? 'hovering' : ''}`} 
-        style={{ left: pos.x, top: pos.y }}
-      />
-      <div 
-        className={`custom-cursor-ring ${isHovering ? 'hovering' : ''}`}
-        style={{ left: pos.x, top: pos.y }}
-      />
+      <div ref={dotRef} className="custom-cursor-dot" />
+      <div ref={ringRef} className="custom-cursor-ring" />
     </>
   )
 }
@@ -149,6 +193,8 @@ function SetRenderer({ exposure, toneMapping }) {
 // ─── AUTO-NORMALIZE MODEL ─────────────────────────────────────────────────────
 // Calculates the optimal scale and position to fit any model into a target world-space size
 function useNormalizedTransform(scene, targetSize = 4, groundIt = true) {
+  const { viewport } = useThree()
+  
   return useMemo(() => {
     // Reset temporarily to calculate accurate unscaled bounding box
     const oldScale = scene.scale.clone()
@@ -170,13 +216,19 @@ function useNormalizedTransform(scene, targetSize = 4, groundIt = true) {
     const maxDim = Math.max(size.x, size.y, size.z)
     if (maxDim === 0) return { scale: 1, position: [0, 0, 0] }
 
-    const scale = targetSize / maxDim
-    const posX = -center.x * scale
-    const posZ = -center.z * scale
-    const posY = groundIt ? -box.min.y * scale : -center.y * scale
+    let finalScale = targetSize / maxDim
+    
+    // Scale down by 35% on mobile (vertical aspect ratio) so models don't clip the edges
+    if (viewport.aspect < 1) {
+      finalScale *= 0.65
+    }
 
-    return { scale, position: [posX, posY, posZ] }
-  }, [scene, targetSize, groundIt])
+    const posX = -center.x * finalScale
+    const posZ = -center.z * finalScale
+    const posY = groundIt ? -box.min.y * finalScale : -center.y * finalScale
+
+    return { scale: finalScale, position: [posX, posY, posZ] }
+  }, [scene, targetSize, groundIt, viewport.aspect])
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -186,6 +238,8 @@ function useNormalizedTransform(scene, targetSize = 4, groundIt = true) {
 function UserCyberSamuraiModel() {
   const group = useRef()
   const mouse = useRef({ x: 0, y: 0 })
+  useInteractiveInput(mouse)
+  
   const { scene, animations } = useGLTF('/cyber_samurai.glb')
   const { actions } = useAnimations(animations, group)
   
@@ -201,13 +255,6 @@ function UserCyberSamuraiModel() {
         a.play()
       })
     }
-
-    const onMove = (e) => {
-      mouse.current.x = (e.clientX / window.innerWidth) * 2 - 1
-      mouse.current.y = -(e.clientY / window.innerHeight) * 2 + 1
-    }
-    window.addEventListener('mousemove', onMove)
-    return () => window.removeEventListener('mousemove', onMove)
   }, [actions, scene])
 
   useFrame((state) => {
@@ -292,6 +339,8 @@ function Page1Scene() {
 function UserCarModel() {
   const group = useRef()
   const mouse = useRef({ x: 0, y: 0 })
+  useInteractiveInput(mouse)
+  
   const { scene } = useGLTF('/car.glb')
   const transform = useNormalizedTransform(scene, 3.5, true)
 
@@ -302,13 +351,6 @@ function UserCarModel() {
         child.receiveShadow = true
       }
     })
-
-    const onMove = (e) => {
-      mouse.current.x = (e.clientX / window.innerWidth) * 2 - 1
-      mouse.current.y = -(e.clientY / window.innerHeight) * 2 + 1
-    }
-    window.addEventListener('mousemove', onMove)
-    return () => window.removeEventListener('mousemove', onMove)
   }, [scene])
 
   useFrame((state) => {
@@ -340,15 +382,7 @@ function UserCarModel() {
 function Page2CameraRig() {
   const mouse = useRef({ x: 0, y: 0 })
   const target = useRef({ x: 0.5, y: 0 }) // start at front-3/4 angle
-
-  useEffect(() => {
-    const onMove = (e) => {
-      mouse.current.x = (e.clientX / window.innerWidth) * 2 - 1
-      mouse.current.y = -(e.clientY / window.innerHeight) * 2 + 1
-    }
-    window.addEventListener('mousemove', onMove)
-    return () => window.removeEventListener('mousemove', onMove)
-  }, [])
+  useInteractiveInput(mouse)
 
   useFrame((state) => {
     // Smoother, tighter camera tracking
@@ -532,6 +566,8 @@ function Clock() {
 function GalaxyModel() {
   const group = useRef()
   const mouse = useRef({ x: 0, y: 0 })
+  useInteractiveInput(mouse)
+  
   const { scene, animations } = useGLTF('/galaxy.glb')
   const { actions } = useAnimations(animations, group)
 
@@ -554,18 +590,6 @@ function GalaxyModel() {
         a.timeScale = 0.3
         a.play()
       })
-    }
-    const onMove = (e) => {
-      const cx = e.touches ? e.touches[0].clientX : e.clientX
-      const cy = e.touches ? e.touches[0].clientY : e.clientY
-      mouse.current.x = (cx / window.innerWidth) * 2 - 1
-      mouse.current.y = -(cy / window.innerHeight) * 2 + 1
-    }
-    window.addEventListener('mousemove', onMove)
-    window.addEventListener('touchmove', onMove)
-    return () => {
-      window.removeEventListener('mousemove', onMove)
-      window.removeEventListener('touchmove', onMove)
     }
   }, [actions, scene])
 
@@ -737,23 +761,10 @@ function ToriiGateModel() {
 function KatanaModel() {
   const group = useRef()
   const mouse = useRef({ x: 0, y: 0 })
+  useInteractiveInput(mouse)
+  
   const { scene } = useGLTF('/katana.glb')
   const transform = useNormalizedTransform(scene, 3.5, false)
-
-  useEffect(() => {
-    const onMove = (e) => {
-      const cx = e.touches ? e.touches[0].clientX : e.clientX
-      const cy = e.touches ? e.touches[0].clientY : e.clientY
-      mouse.current.x = (cx / window.innerWidth) * 2 - 1
-      mouse.current.y = -(cy / window.innerHeight) * 2 + 1
-    }
-    window.addEventListener('mousemove', onMove)
-    window.addEventListener('touchmove', onMove)
-    return () => {
-      window.removeEventListener('mousemove', onMove)
-      window.removeEventListener('touchmove', onMove)
-    }
-  }, [scene])
 
   useFrame((state) => {
     if (group.current) {
