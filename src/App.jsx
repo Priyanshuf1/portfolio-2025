@@ -147,38 +147,36 @@ function SetRenderer({ exposure, toneMapping }) {
 }
 
 // ─── AUTO-NORMALIZE MODEL ─────────────────────────────────────────────────────
-// Fits any model into a target world-space size so it always fills the screen
-function normalizeModel(scene, targetSize = 4, groundIt = true) {
-  if (scene.userData.normalized) return; // Prevent double-scaling on React refreshes
-  scene.userData.normalized = true;
+// Calculates the optimal scale and position to fit any model into a target world-space size
+function useNormalizedTransform(scene, targetSize = 4, groundIt = true) {
+  return useMemo(() => {
+    // Reset temporarily to calculate accurate unscaled bounding box
+    const oldScale = scene.scale.clone()
+    const oldPos = scene.position.clone()
+    scene.scale.setScalar(1)
+    scene.position.set(0, 0, 0)
+    scene.updateMatrixWorld(true)
 
-  scene.scale.setScalar(1)
-  scene.position.set(0, 0, 0)
-  scene.updateMatrixWorld(true)
+    const box = new THREE.Box3().setFromObject(scene)
+    const size = new THREE.Vector3()
+    box.getSize(size)
+    const center = new THREE.Vector3()
+    box.getCenter(center)
 
-  const box = new THREE.Box3().setFromObject(scene)
-  const size = new THREE.Vector3()
-  box.getSize(size)
-  const center = new THREE.Vector3()
-  box.getCenter(center)
+    // Restore original just in case
+    scene.scale.copy(oldScale)
+    scene.position.copy(oldPos)
 
-  const maxDim = Math.max(size.x, size.y, size.z)
-  if (maxDim === 0) return
+    const maxDim = Math.max(size.x, size.y, size.z)
+    if (maxDim === 0) return { scale: 1, position: [0, 0, 0] }
 
-  const scale = targetSize / maxDim
-  scene.scale.setScalar(scale)
+    const scale = targetSize / maxDim
+    const posX = -center.x * scale
+    const posZ = -center.z * scale
+    const posY = groundIt ? -box.min.y * scale : -center.y * scale
 
-  box.setFromObject(scene)
-  box.getCenter(center)
-
-  scene.position.x -= center.x
-  scene.position.z -= center.z
-  if (groundIt) {
-    const minY = box.min.y
-    scene.position.y -= minY
-  } else {
-    scene.position.y -= center.y
-  }
+    return { scale, position: [posX, posY, posZ] }
+  }, [scene, targetSize, groundIt])
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -190,11 +188,11 @@ function UserCyberSamuraiModel() {
   const mouse = useRef({ x: 0, y: 0 })
   const { scene, animations } = useGLTF('/cyber_samurai.glb')
   const { actions } = useAnimations(animations, group)
+  
+  // Calculate fixed scale and position
+  const transform = useNormalizedTransform(scene, 20.0, false)
 
   useEffect(() => {
-    // Scaled down to 20.0
-    normalizeModel(scene, 20.0, false)
-    
     // Play baked animations if they exist
     if (actions && Object.keys(actions).length > 0) {
       Object.values(actions).forEach(a => {
@@ -232,7 +230,7 @@ function UserCyberSamuraiModel() {
   return (
     // Micro-adjusted very very little up (-4.2)
     <group ref={group} position={[0, -4.2, -6.5]}>
-      <primitive object={scene} />
+      <primitive object={scene} scale={transform.scale} position={transform.position} />
     </group>
   )
 }
@@ -249,9 +247,9 @@ function JapaneseSunsetBackground() {
       {/* Intense Sun glow */}
       <pointLight position={[0, 4, -28]} intensity={50} color="#ff3300" distance={60} />
 
-      {/* Floating Embers / Birds */}
-      <Sparkles count={300} scale={[35, 15, 20]} size={4} speed={2} color="#ffaa00" position={[0, 4, -10]} opacity={0.8} />
-      <Sparkles count={150} scale={[25, 10, 10]} size={3} speed={3} color="#ff0000" position={[0, 2, -5]} opacity={1} />
+      {/* Floating Embers / Birds - Optimized for mobile */}
+      <Sparkles count={100} scale={[35, 15, 20]} size={4} speed={2} color="#ffaa00" position={[0, 4, -10]} opacity={0.8} />
+      <Sparkles count={50} scale={[25, 10, 10]} size={3} speed={3} color="#ff0000" position={[0, 2, -5]} opacity={1} />
     </>
   )
 }
@@ -295,9 +293,9 @@ function UserCarModel() {
   const group = useRef()
   const mouse = useRef({ x: 0, y: 0 })
   const { scene } = useGLTF('/car.glb')
+  const transform = useNormalizedTransform(scene, 3.5, true)
 
   useEffect(() => {
-    normalizeModel(scene, 3.5, true)
     scene.traverse((child) => {
       if (child.isMesh) {
         child.castShadow = true
@@ -333,7 +331,7 @@ function UserCarModel() {
 
   return (
     <group ref={group} position={[0, 0, 0]}>
-      <primitive object={scene} />
+      <primitive object={scene} scale={transform.scale} position={transform.position} />
     </group>
   )
 }
@@ -508,10 +506,10 @@ function Page2Scene() {
         <meshBasicMaterial color="#00eaff" transparent opacity={0.04} />
       </mesh>
 
-      <Sparkles count={300} scale={[8, 4, 60]} size={4} speed={6} color="#00eaff" position={[0, 1, -25]} />
-      <Sparkles count={200} scale={[8, 3, 60]} size={3} speed={5} color="#ff0044" position={[0, 0.5, -25]} />
+      <Sparkles count={100} scale={[8, 4, 60]} size={4} speed={6} color="#00eaff" position={[0, 1, -25]} />
+      <Sparkles count={50} scale={[8, 3, 60]} size={3} speed={5} color="#ff0044" position={[0, 0.5, -25]} />
 
-      <ContactShadows position={[0, 0.01, 0]} opacity={0.9} scale={18} blur={4} color="#00eaff" />
+      <ContactShadows position={[0, 0.01, 0]} opacity={0.9} scale={18} blur={4} color="#00eaff" frames={1} />
     </>
   )
 }
@@ -538,9 +536,6 @@ function GalaxyModel() {
   const { actions } = useAnimations(animations, group)
 
   useEffect(() => {
-    // Keep original materials — just scale it up and enable vertex colors
-    normalizeModel(scene, 22.0, false)
-
     // Enable vertex colors on every material so baked colors display correctly
     scene.traverse((child) => {
       if (child.isMesh || child.isPoints || child.isLine) {
@@ -586,9 +581,12 @@ function GalaxyModel() {
     }
   })
 
+  // Calculate fixed scale and position
+  const transform = useNormalizedTransform(scene, 22.0, false)
+
   return (
     <group ref={group} position={[0, 0, 0]}>
-      <primitive object={scene} />
+      <primitive object={scene} scale={transform.scale} position={transform.position} />
     </group>
   )
 }
@@ -726,13 +724,12 @@ function Page4Scene() {
 
 function ToriiGateModel() {
   const { scene } = useGLTF('/torii_gate.glb')
-  useEffect(() => {
-    normalizeModel(scene, 10.0, true)
-  }, [scene])
+  const transform = useNormalizedTransform(scene, 10.0, true)
+
   return (
     // Pulled up 50% from -9.0 to -4.5
     <group position={[0, -4.5, -1]}>
-      <primitive object={scene} />
+      <primitive object={scene} scale={transform.scale} position={transform.position} />
     </group>
   )
 }
@@ -741,9 +738,9 @@ function KatanaModel() {
   const group = useRef()
   const mouse = useRef({ x: 0, y: 0 })
   const { scene } = useGLTF('/katana.glb')
+  const transform = useNormalizedTransform(scene, 3.5, false)
 
   useEffect(() => {
-    normalizeModel(scene, 3.5, false)
     const onMove = (e) => {
       const cx = e.touches ? e.touches[0].clientX : e.clientX
       const cy = e.touches ? e.touches[0].clientY : e.clientY
@@ -772,7 +769,7 @@ function KatanaModel() {
 
   return (
     <group ref={group} position={[0, 0.5, 1.5]}>
-      <primitive object={scene} />
+      <primitive object={scene} scale={transform.scale} position={transform.position} />
     </group>
   )
 }
@@ -805,18 +802,17 @@ function Page5Scene() {
         <KatanaModel />
       </Suspense>
 
-      {/* Falling sakura / ember particles */}
-      <Sparkles count={400} scale={[20, 15, 10]} size={3} speed={1.5} color="#ff6b35" position={[0, 5, 0]} opacity={0.7} />
-      <Sparkles count={200} scale={[15, 10, 8]} size={2} speed={2} color="#ffcc44" position={[0, 3, 2]} opacity={0.5} />
-      <Sparkles count={150} scale={[10, 8, 6]} size={4} speed={1} color="#ff9944" position={[0, 6, -2]} opacity={0.4} />
-
+      {/* Falling sakura / ember particles - Optimized for mobile */}
+      <Sparkles count={100} scale={[20, 15, 10]} size={3} speed={1.5} color="#ff6b35" position={[0, 5, 0]} opacity={0.7} />
+      <Sparkles count={50} scale={[15, 10, 8]} size={2} speed={2} color="#ffcc44" position={[0, 3, 2]} opacity={0.5} />
+      
       {/* Ground mist */}
       <mesh position={[0, -1.1, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[60, 60]} />
         <meshBasicMaterial color="#200800" transparent opacity={0.6} />
       </mesh>
 
-      <ContactShadows position={[0, -1.0, 0]} opacity={0.6} scale={20} blur={3} color="#ff4400" />
+      <ContactShadows position={[0, -1.0, 0]} opacity={0.6} scale={20} blur={3} color="#ff4400" frames={1} />
     </>
   )
 }
@@ -871,7 +867,7 @@ export default function App() {
         <Canvas
           className="scene-canvas"
           camera={{ position: [0, 1, 9], fov: 55 }}
-          dpr={[1, 2]}
+          dpr={[1, 1.5]}
           gl={{ antialias: true }}
         >
           <Page1Scene />
@@ -928,7 +924,7 @@ export default function App() {
         <Canvas
           className="scene-canvas"
           camera={{ position: [0, 1.4, 6.5], fov: 55 }}
-          dpr={[1, 2]}
+          dpr={[1, 1.5]}
           shadows
           gl={{ antialias: true }}
         >
@@ -970,7 +966,7 @@ export default function App() {
         <Canvas
           className="scene-canvas"
           camera={{ position: [0, 1, 10], fov: 55 }}
-          dpr={[1, 2]}
+          dpr={[1, 1.5]}
           gl={{ antialias: true }}
         >
           <Page3Scene />
@@ -1109,7 +1105,7 @@ export default function App() {
         <Canvas
           className="scene-canvas"
           camera={{ position: [0, 1.5, 7], fov: 55 }}
-          dpr={[1, 2]}
+          dpr={[1, 1.5]}
           shadows
           gl={{ antialias: true }}
         >

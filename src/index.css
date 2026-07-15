@@ -877,11 +877,27 @@ a, button {
   .page1-title, .page2-title { font-size: clamp(2.5rem, 9vw, 4rem); }
   .page1-sidebar { display: none; }
   .header { padding: 1.5rem; }
+  .header-logo { font-size: 0.75rem; }
   .page1-content, .page2-content { padding: 0 1.5rem 2.5rem; }
-  .tempo { left: 1.5rem; }
-  .page3-projects { grid-template-columns: 1fr; }
-  .page3-title { font-size: clamp(2.5rem, 9vw, 4rem); }
-  .page3-content { top: auto; bottom: 2rem; transform: translateX(-50%); }
+  .tempo { left: 1.5rem; display: none; }
+  
+  .page3-projects { grid-template-columns: 1fr; gap: 0.8rem; }
+  .page3-title { font-size: clamp(2rem, 8vw, 3.5rem); margin-bottom: 0.8rem; }
+  .page3-content { top: 40%; transform: translate(-50%, -50%); width: 95%; max-width: 100%; }
+  .page3-desc { font-size: 0.75rem; margin-bottom: 1.5rem; }
+  .project-card { padding: 0.8rem 1rem; }
+
   .page4-title { font-size: clamp(2rem, 8vw, 3.5rem); }
+  .page4-content { left: 1.5rem; bottom: 4.5rem; width: 90%; }
+  
+  .page5-content {
+    left: 5%;
+    width: 90%;
+    max-width: 100%;
+  }
+  .page5-title { font-size: clamp(1.8rem, 7vw, 2.8rem); margin-bottom: 1.5rem; }
+  .about-grid { gap: 1.5rem; }
+  .about-stats { gap: 1rem; }
+  .stat-num { font-size: 1.2rem; }
 }
 
